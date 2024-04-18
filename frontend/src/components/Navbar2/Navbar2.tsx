@@ -14,7 +14,7 @@ const Navbar2 = () => {
                 <div className='flex items-center gap-4'>
                     <NavLink to='/' className='flex items-center gap-4' >
                         <img src={Logo} alt="logo" className='h-8 w-8' />
-                        <span className='hidden font-[600] text-[16px] sm:flex'>Company name</span>
+                        <span className='hidden font-[600] text-[16px] sm:flex'>Paytiz</span>
                     </NavLink>
                     <div className={`hidden md:flex items-center gap-4 ${active ? 'flex' : 'hidden'}`}>
                         <NavLink

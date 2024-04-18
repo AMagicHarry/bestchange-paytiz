@@ -22,17 +22,18 @@ const ExchangerRow = () => {
     const [isToggled, setIsToggled] = useState(false);
 
     const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setIsToggled(e.target.checked);  
-    };
+        e.stopPropagation(); 
+        setIsToggled(e.target.checked);  
+      };
 
     return (
-        <tr onClick={handleNavigate} className='hover:bg-gray-100 duration-300'>
+        <tr  className='hover:bg-gray-100 duration-300'>
             <td className="px-6  py-4 whitespace-nowrap">
 
             <div className="flex gap-[2rem] items-center">
 
             <div className="flex items-center gap-[.5rem]">
-                            <span className="border cursor-pointer hover:bg-gray-200 duration-300 rounded-md min-w-[20px] h-[20px]"></span>
+                            <span onClick={handleNavigate} className="border cursor-pointer hover:bg-gray-200 duration-300 rounded-md min-w-[20px] h-[20px]"></span>
                             <img className="rounded-md w-[20px] h-[20px]" src={Country} alt="" />
                         </div>
                         
