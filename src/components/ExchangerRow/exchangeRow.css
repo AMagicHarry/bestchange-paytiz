@@ -1,0 +1,45 @@
+.rowContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .rowContainer {
+        flex-direction: row;
+    }
+
+    .cell {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.imgResponsive {
+    width: 100%;
+    max-width: 40px; /* Keeps the image within bounds */
+    height: auto;
+}
+
+.flexWrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.iconSize {
+    font-size: 1rem; /* Responsive font size */
+}
+
+.minMaxContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}

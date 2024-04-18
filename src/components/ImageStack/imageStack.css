@@ -1,0 +1,24 @@
+.image-stack {
+  display: flex; 
+  align-items: center; 
+}
+
+.image-container, .remaining-container {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color:#F2F4F7;
+  border-radius: 50%;
+  color: #475467; 
+  font-size: 0.75rem; 
+  border: 2px solid var(--Colors-Background-bg-primary, #FFFFFF)
+}
+
+.image-container img {
+  width: 100%; 
+  height: 100%; 
+  border-radius: 50%; 
+  object-fit: cover;
+}
