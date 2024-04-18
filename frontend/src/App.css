@@ -1,0 +1,17 @@
+.box-shadow{
+  box-shadow: 0px 4px 20px 0px #0000001A;
+}
+
+.ellipsis-2-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;  
+  height: 2.4em;   
+}
+
+.box-shadow-2 {
+  box-shadow: 0px 1px 2px 0px #1018280D;
+}
