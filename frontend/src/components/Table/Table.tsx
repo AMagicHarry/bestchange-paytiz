@@ -43,7 +43,7 @@ const Table: React.FC<TableProps> = ({ columns, data,RowComponent, rowsPerPage =
                             </thead>
                             <tbody className=" divide-y divide-gray-200">
                                 {currentData.map((currentData) => (
-                                    <RowComponent key={currentData.id}/>
+                                    <RowComponent exchanger={currentData} key={currentData.id}/>
                                 ))}
                             </tbody>
                         </table>

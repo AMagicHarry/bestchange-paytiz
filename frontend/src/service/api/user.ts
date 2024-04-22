@@ -8,21 +8,21 @@ const api = axios.create({
 });
 
 export const getUsersApi = async (): Promise<any> => {
-    return await api.get(`${baseUrl}/user`)
+    return await api.get(`/user`)
 }
 
 export const getUserApi = async ({ userId }: { userId: string }) => {
-    return await api.get(`${baseUrl}/user/${userId}`)
+    return await api.get(`/user/${userId}`)
 }
 
 export const addUserApi = async ({ user }: { user: Partial<User> }): Promise<any> => {
-    return await api.post(`${baseUrl}/user`, user);
+    return await api.post(`/user`, user);
 };
 
 export const deleteUserApi = async ({ userId }: { userId: string }): Promise<void> => {
-    return await api.delete(`${baseUrl}/user/${userId}`)
+    return await api.delete(`/user/${userId}`)
 };
 
 export const updateUserApi = async ({ userId, updatedUser }: { userId: string, updatedUser: Partial<User> }): Promise<void> => {
-    return await api.put(`${baseUrl}/user/${userId}`, updatedUser)
+    return await api.put(`/user/${userId}`, updatedUser)
 };

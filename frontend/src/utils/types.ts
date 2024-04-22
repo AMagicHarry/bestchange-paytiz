@@ -1,11 +1,11 @@
 export interface Blog {
     _id: string;      
-    user: string;     
+    user: User;     
     title: string;
     content: string;
     avatar: string;
-    createdAt?: Date; 
-    updatedAt?: Date;  
+    createdAt: string; 
+    updatedAt: string;  
 }
 
 
@@ -14,19 +14,23 @@ export interface User {
     firstName: string;
     lastName: string;
     avatar: string;
-    country?: string;
+    country: string;
+    countryCode?:string;
+    userName:string;
     role?: 'user' | 'admin';          
     totalEarnings?: number;
     totalWithdrawal?: number;
     availableForWithdrawal?: number;
     referrals?: Referral[];
-    createdAt?: Date;                 
-    updatedAt?: Date;                
+    createdAt?: string;                 
+    updatedAt?: string;                
 }
 
 
 export interface Referral {
-    user:User,
+    _id:string;
+    referrer:User,
+    referred:User,
     createdAt:string;
     updatedAt:string;
 }
@@ -36,18 +40,42 @@ export interface Exchanger {
     _id: string;                          
     user: User;                        
     avatar: string;
-    website?: string;                    
+    currency:{
+        code:string;
+        name:string;
+        symbol?:string;
+    };
+    website: string;                    
     name: string;
-    rating?: number;                      
-    exchangeRate: number;
+    rating: number;                      
     rateRange: {
         min: number;
         max: number;
     };
     siteOn: boolean;
     isActive: boolean;
-    verified?: boolean;              
-    legalRegistration?: boolean;       
-    createdAt?: Date;           
-    updatedAt?: Date;      
+    verified: boolean;              
+    legalRegistration: boolean;       
+    createdAt?: string;           
+    updatedAt?: string;      
 }
+
+
+export interface ExchangerSummary {
+    _id:string
+    title:string;
+    total: number;
+    stat:{currentMonth:{_id:string,count:number}[],previousMonth:{_id:string,count:number}[]},
+    status:boolean;
+}
+
+export interface Review {
+    _id:string;
+    user: User;
+    content: string;
+    rating?: number; 
+    createdAt?: string;           
+    updatedAt?: string;  
+
+  }
+  

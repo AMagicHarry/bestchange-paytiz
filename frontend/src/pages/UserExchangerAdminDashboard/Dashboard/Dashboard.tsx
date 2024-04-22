@@ -1,4 +1,3 @@
-import Country from '../../../assets/country.svg'
 import ReviewersCard from "../../../components/ReviewersCard/ReviewersCard";
 import SwitchButton from "../../../components/switchbutton/SwitchButton";
 import Avatar from '../../../assets/exchangerAvatar.svg'
@@ -6,21 +5,73 @@ import DatePicker from '../../../components/DatePicker/DatePicker';
 import { MdOutlineFilterList } from 'react-icons/md';
 import Arrowup from '../../../assets/arrow-up.svg'
 import Chart from '../../../assets/Line and bar chart.svg'
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useState } from 'react';
+import { getReviewsApi } from '../../../service/api/review';
+import { Exchanger, Review } from '../../../utils/types';
+import { getUserExchangerApi } from '../../../service/api/exchanger';
+import { useEffect } from 'react';
+import { CountryAvatar } from "../../../components/CountryFlag/CountryFlage";
+import { formatDate } from "../../../utils/functions";
+import { useAuthContext } from "../../../hooks/useAuthContext";
 
 
 const Dashboard = () => {
-  const reviewers = [
-    {
-      id: "1",
-      name: "Caitylin King",
-      content: " Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date: "Jan 11,2023 at 01:49pm",
-      rating: '5',
-      countryIcon: Country
-    },
-  ]
+  const {username} = useParams();
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [exchanger, setExchanger] = useState<Exchanger|null>(null); 
+
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [exchangerLoading, setExchangersLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState(null);
+  const [exchangerError, setExchangerError] = useState(null);
+
+  const {setUser} = useAuthContext()
+
+
+
+  const fetchReviews = async () => {
+    setReviewsLoading(true);
+    setReviewsError(null);
+    try {
+     if(username && exchanger?._id){
+      const {data} = await getReviewsApi(exchanger.user._id); 
+      console.log(data)
+      setReviews(data);
+     }
+    } catch (error:any) {
+      setReviewsError(error?.response.data);
+      console.error("Failed to fetch reviews:", error);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+
+  const fetchExchanger = async () => {
+    setExchangersLoading(true);
+    setExchangerError(null);
+    try {
+      if(username){
+        const {data}:{data:Exchanger} = await getUserExchangerApi({userName:username}); 
+      setExchanger(data);
+      setUser(data?.user)
+      }
+    } catch (error:any) {
+      setExchangerError(error.message);
+      console.error("Failed to fetch exchangers:", error);
+    } finally {
+      setExchangersLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExchanger();
+  }, [username]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [exchanger?.user._id]);
 
   const [isToggled, setIsToggled] = useState(false);
 
@@ -66,9 +117,11 @@ const Dashboard = () => {
             </div>
             <div>
               <div className='font-[600]'>
-                Catalog
+                {
+                  exchanger?.name
+                }
               </div>
-              <p>Catalogapp.io</p>
+              <p>{exchanger?.website}</p>
             </div>
 
           </div>
@@ -77,21 +130,24 @@ const Dashboard = () => {
             <div className='flex flex-col gap-[1rem]'>
               <div className='flex items-center gap-[1rem]'>
                 <span className='w-[5rem] text-[16px] text-[#475467] font-[400]'>Status:   </span>
-                <div className='rounded-full border w-[81px] flex items-center justify-center h-[22px]  bg-[#ABEFC6]'>Active</div>
+                <div className='rounded-full border w-[81px] flex items-center justify-center h-[22px]  bg-[#ABEFC6]'>{exchanger?.isActive?"Active":"Suspended"}</div>
               </div>
               <div className='flex items-center gap-[1rem]'>
                 <span className='w-[5rem]  text-[16px]text-[#475467] font-[400]'>Owner:   </span>
-                <div >Henry VII</div>
+                <div >{exchanger?.user.firstName}  {exchanger?.user.lastName}</div>
               </div>
               <div className='flex items-center gap-[1rem]'>
                 <span className='w-[5rem] text-[16px] text-[#475467] font-[400]'>Country:   </span>
+                <div className='w-[40px] h-[40px] rounded-full overflow-hidden'>
+                            <CountryAvatar code={exchanger?.user.countryCode??""}/>
+                     </div>
                 <div className="w-[40px] h-[40px] rounded-full overflow-hidden">
-                  <img className="w-ful h-full " src={Country} alt="" />
+                  <img className="w-ful h-full " src={exchanger?.user.country} alt="" />
                 </div>
               </div>
               <div className='flex items-center gap-[1rem]'>
                 <span className='w-[5rem] text-[16px] text-[#475467] font-[400]'>Established:   </span>
-                <div>2017</div>
+                <div>{formatDate(exchanger?.createdAt??"")}</div>
               </div>
             </div>
 
@@ -101,14 +157,14 @@ const Dashboard = () => {
 
                 <span className='flex items-center gap-[.2rem]'>
                   <span className="text-[#475467]">min:</span>
-                  <span className='font-[600] text-[14px]'>19.978730</span> <span className='font-[400] text-[#475467] text-[12px]'>BTC</span>
+                  <span className='font-[600] text-[14px]'>{exchanger?.rateRange.min}</span> <span className='font-[400] text-[#475467] text-[12px]'>BTC</span>
                 </span>
                 <div className='border-[1px] border-[#D0D0D0] w-full sm:w-[200px]'>
 
                 </div>
                 <span className='flex items-center gap-[.2rem]'>
                   <span className="text-[#475467]">max:</span>
-                  <span className='font-[600] text-[14px]'>19.978730</span> <span className='font-[400] text-[#475467] text-[12px]'>BTC</span>
+                  <span className='font-[600] text-[14px]'>{exchanger?.rateRange.min}</span> <span className='font-[400] text-[#475467] text-[12px]'>BTC</span>
                 </span>
 
               </div>
@@ -234,8 +290,8 @@ const Dashboard = () => {
           Reviews
         </div>
         {
-          reviewers.map(review => {
-            return <ReviewersCard key={review.id} isEditable={true} review={review} />
+          reviews && reviews.length > 0 && reviews.slice(0,1).map(review => {
+            return <ReviewersCard key={review._id} isEditable={true} review={review} />
           })
         }
        </div>

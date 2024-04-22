@@ -31,11 +31,12 @@ const Table2: React.FC<TableProps> = ({data, Component, rowsPerPage = 9 }) => {
                     <div className=" overflow-hidden p-[1rem]  border-gray-200 ">
                         <div className="min-w-full">
                             <div className="sm:grid-cols-2 grid gap-[1rem]">
-                                {currentData.map((user) => (
-                                   <div key={user._id}>
-                                     <Component  user={user}/>
+                                {currentData.map((referral) => {
+                                    console.log(referral)
+                                   return <div key={referral._id}>
+                                     <Component established={referral?.createdAt}  user={referral?.referred}/>
                                    </div>
-                                ))}
+})}
                             </div>
                         </div>
                     </div>

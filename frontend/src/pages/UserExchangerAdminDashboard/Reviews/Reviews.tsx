@@ -1,63 +1,54 @@
 import { FaAward } from "react-icons/fa";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
-import Country from '../../../assets/country.svg'
 import ReviewersCard from "../../../components/ReviewersCard/ReviewersCard";
 import SwitchButton from "../../../components/switchbutton/SwitchButton";
 import { useState } from "react";
-
-
+import { getReviewsApi } from "../../../service/api/review";
+import { Review } from "../../../utils/types";
+import { useParams } from "react-router-dom";
+import { ClipLoader } from "react-spinners";
+import { getUserExchangerApi } from "../../../service/api/exchanger";
+import { useEffect } from "react";
 
 
 
 const Reviews = () => {
-  const reviewers = [
-    {
-      id: "1",
-      name: "Caitylin King",
-      content: " Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date: "Jan 11,2023 at 01:49pm",
-      rating: '5',
-      countryIcon: Country
-    },
-    {
-      id: "2",
-      name: "Caitylin King",
-      content: " Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date: "Jan 11,2023 at 01:49pm",
-      rating: '5',
-      countryIcon: Country
-    },
-    {
-      id: "3",
-      name: "Caitylin King",
-      content: " Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date: "Jan 11,2023 at 01:49pm",
-      rating: '5',
-      countryIcon: Country
-    },
-    {
-      id: "4",
-      name: "Caitylin King",
-      content: " Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date: "Jan 11,2023 at 01:49pm",
-      rating: '5',
-      countryIcon: Country
-    },
-    {
-      id: "5",
-      name: "Caitylin King",
-      content: " Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date: "Jan 11,2023 at 01:49pm",
-      rating: '5',
-      countryIcon: Country
-    },
-  ]
+
+  const {username} = useParams()
+
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+
+
+
+  const fetchReviews = async () => {
+    setReviewsLoading(true);
+    try {
+     if(username){
+      const exchangerResponse = await getUserExchangerApi({userName:username}); 
+      const {data} = await getReviewsApi(exchangerResponse?.data.user._id); 
+      console.log(data)
+      setReviews(data);
+     }
+    } catch (error:any) {
+      console.error("Failed to fetch reviews:", error);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchReviews();
+  }, [username]);
 
   const [isToggled, setIsToggled] = useState(false);
 
   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsToggled(e.target.checked);
   };
+
 
   return (
     <div className='w-full sm:px-[1rem] pb-[2rem]  '>
@@ -95,10 +86,13 @@ const Reviews = () => {
         <div className="font-[500]">
           Reviews
         </div>
+        
         {
-          reviewers.map(review => {
-            return <ReviewersCard key={review.id} isEditable={true} review={review} />
-          })
+          reviews && reviews.length > 0 && !reviewsLoading ? reviews.map((review:Review) => {
+            return <ReviewersCard key={review._id} isEditable={true} review={review} />
+          }):<div className="mt-[2rem] flex items-center justify-center">
+          <ClipLoader size={14} color='black' />
+        </div>
         }
       </div>
 

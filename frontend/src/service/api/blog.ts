@@ -1,32 +1,34 @@
 import { Blog } from "../../utils/types";
 import axios from "axios";
 
-const baseUrl: string = import.meta.env.VITE_BACKEND_ENDPOINT
+// Assuming your backend endpoint is correctly loaded from environment variables
+const baseUrl: string = import.meta.env.VITE_BACKEND_ENDPOINT;
 
 const api = axios.create({
     baseURL: baseUrl,
-    withCredentials: true,
 });
 
-
 export const getBlogsApi = async (): Promise<any> => {
-    return await api.get(`${baseUrl}/blog`,)
-}
-
-export const getBlogApi = async ({ blogId }: { blogId: string}) => {
-    return await api.get(`${baseUrl}/blog/${blogId}`)
-}
-
-
-export const addBlogApi = async ({ blog}: { blog: Partial<Blog>,}): Promise<any> => {
-    return await api.post(`${baseUrl}/blog`, blog);
+    return await api.get(`/blog`);
 };
 
-
-export const deleteBlogApi = async ({ blogId}: { blogId: string}): Promise<void> => {
-    return await api.delete(`${baseUrl}/blog/${blogId}`)
+export const getRecentBlogsApi = async (): Promise<any> => {
+    return await api.get(`/blog/recent`);
 };
 
-export const updateBlogApi = async ({ blogId, updatedBlog }: { blogId: string, updatedBlog: Partial<Blog>, token: string }): Promise<void> => {
-    return await api.put(`${baseUrl}/blog/${blogId}`, updatedBlog)
+export const getBlogApi = async ({ blogId }: { blogId: string }): Promise<any> => {
+    return await api.get(`/blog/${blogId}`);
+};
+
+export const addBlogApi = async ({ blog }: { blog: Partial<Blog> }): Promise<any> => {
+    return await api.post(`/blog`, blog);
+};
+
+export const deleteBlogApi = async ({ blogId }: { blogId: string }): Promise<void> => {
+    return await api.delete(`/blog/${blogId}`);
+};
+
+export const updateBlogApi = async ({ blogId, updatedBlog }: { blogId: string, updatedBlog: Partial<Blog> }): Promise<void> => {
+    // Including Authorization header with Bearer token
+    return await api.put(`/blog/${blogId}`, updatedBlog);
 };
