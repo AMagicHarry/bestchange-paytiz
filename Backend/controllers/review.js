@@ -11,18 +11,35 @@ exports.addReview = async (req, res, next) => {
         await newReview.save();
         res.status(201).json(newReview);
     } catch (error) {
-        next({ message: 'Internal server error'});
+        next({ message: 'Internal server error' });
     }
 };
 
 
 
 exports.getReviews = async (req, res, next) => {
+    const { userId,userName } = req.query
+    let reviews;
     try {
-        const reviews = await Review.find().populate('user');
+        if (userId) {
+            reviews = await Review.find({ user: userId }).populate('user');
+            return res.status(200).json(reviews);
+        }
+        
+        reviews = await Review.find({ user: userId }).populate('user');
         res.status(200).json(reviews);
     } catch (error) {
-        next({ message: 'Internal server error'});
+        console.log(error)
+        next({ message: 'Internal server error' });
+    }
+};
+
+exports.getExchangerReviews = async (req, res, next) => {
+    try {
+        const reviews = await Review.find({ user: req.params.userId }).populate('user');
+        res.status(200).json(reviews);
+    } catch (error) {
+        next({ message: 'Internal server error' });
     }
 };
 
@@ -34,7 +51,7 @@ exports.getReview = async (req, res, next) => {
         }
         res.status(200).json(review);
     } catch (error) {
-        next({ message: 'Internal server error'});
+        next({ message: 'Internal server error' });
     }
 };
 
@@ -47,7 +64,7 @@ exports.updateReview = async (req, res, next) => {
         }
         res.status(200).json(updatedReview);
     } catch (error) {
-        next({ message: 'Internal server error'});
+        next({ message: 'Internal server error' });
     }
 };
 
@@ -59,6 +76,7 @@ exports.deleteReview = async (req, res, next) => {
         }
         res.status(200).json({ message: 'Review deleted successfully' });
     } catch (error) {
-        next({ message: 'Internal server error'});
+        next({ message: 'Internal server error' });
     }
 };
+

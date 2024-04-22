@@ -1,34 +1,51 @@
-const getExchangerSummary = async (days, metric,model) => {
+exports.getExchangerSummary = async (days, metric, model, previousTotal) => {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(endDate.getDate() - days);
 
-    let matchStage = {
-        createdAt: { $gte: startDate, $lte: endDate }
-    };
+    let dailyData = [];
 
-    const totalResults = await model.aggregate([
-        { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
-        { $count: 'total' }
-    ]);
-    const totalExchangers = totalResults.length > 0 ? totalResults[0].total : 0;
+    for (let i = 0; i <= days; i++) {
+        let dayStart = new Date(startDate);
+        dayStart.setDate(startDate.getDate() + i);
+        let dayEnd = new Date(dayStart);
+        dayEnd.setDate(dayStart.getDate() + 1);
 
-    if (metric === 'totalVerified') {
-        matchStage.verified = true;
-    } else if (metric === 'totalActive') {
-        matchStage.isActive = true;
+        let matchStage = {
+            createdAt: { $gte: dayStart, $lte: dayEnd }
+        };
+
+        if (metric === 'totalVerified') {
+            matchStage.verified = true;
+        } else if (metric === 'totalActive') {
+            matchStage.isActive = true;
+        }
+
+        const dailyResult = await model.aggregate([
+            { $match: matchStage },
+            { $count: 'total' }
+        ]);
+
+        const dailyTotal = dailyResult.length > 0 ? dailyResult[0].total : 0;
+        dailyData.push(dailyTotal);
     }
 
-    const matchedResults = await model.aggregate([
-        { $match: matchStage },
-        { $count: 'total' }
-    ]);
-    const matchedTotal = matchedResults.length > 0 ? matchedResults[0].total : 0;
+    let percentageChanges = [];
 
-    let percentage = totalExchangers > 0 ? (matchedTotal / totalExchangers * 100).toFixed(2) : 0;
+    for (let i = 1; i < dailyData.length; i++) {
+        let previousDayTotal = dailyData[i - 1];
+        let currentDayTotal = dailyData[i];
+        let dailyChange = currentDayTotal - previousDayTotal;
+        let percentageChange = previousDayTotal > 0 ? (dailyChange / previousDayTotal) * 100 : 0;
+        percentageChanges.push(percentageChange.toFixed(2));
+    }
+
+    let overallChange = dailyData[dailyData.length - 1] - dailyData[0];
+    let isOverallIncrease = overallChange > 0;
 
     return {
-        total: matchedTotal,
-        percentage: parseFloat(percentage)  
+        percentageChanges: percentageChanges,
+        total: dailyData[dailyData.length - 1],
+        status: isOverallIncrease
     };
-}
+};

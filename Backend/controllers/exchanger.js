@@ -1,5 +1,6 @@
 const Exchanger = require('../models/Exchanger');
-const getExchangerSummary = require('../utils/functions')
+const User = require('../models/User')
+const {getExchangerSummary} = require('../utils/functions')
 
 
 exports.createExchanger = async (req, res, next) => {
@@ -13,23 +14,122 @@ exports.createExchanger = async (req, res, next) => {
         await newExchanger.save();
         res.status(201).json(newExchanger);
     } catch (error) {
-        next({ message: 'Internal server error', error });
+        next({ message: 'Internal server error'});
     }
 };
 
 
-exports.getExchangeStat = async (req, res, next) => {
-    try {
-        const days = parseInt(req.params.days);
-        const metric = req.params.metric;
-        
-        const totalExchangers = await getExchangerSummary(days, metric,Exchanger);
-        const totalVerified = await getExchangerSummary(days, metric,Exchanger);
-        const totalActive = await getExchangerSummary(days, metric,Exchanger);
+exports.getExchangeStat = async (req, res) => {
+    const today = new Date();
+    const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfPreviousMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
 
-        return res.status(200).json({totalExchangers,totalVerified,totalActive})
+    try {
+        const result = await Exchanger.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startOfPreviousMonth }
+                }
+            },
+            {
+                $facet: {
+                    totalExchangers: [
+                        { $count: 'total' }
+                    ],
+                    totalVerified: [
+                        { $match: { verified: true } },
+                        { $count: 'total' }
+                    ],
+                    totalActive: [
+                        { $match: { isActive: true } },
+                        { $count: 'total' }
+                    ],
+                    dailyStatsPreviousMonth: [
+                        {
+                            $match: {
+                                createdAt: { $gte: startOfPreviousMonth, $lt: startOfCurrentMonth }
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: {
+                                    day: { $dayOfMonth: "$createdAt" },
+                                    month: { $month: "$createdAt" },
+                                    year: { $year: "$createdAt" }
+                                },
+                                count: { $sum: 1 }
+                            }
+                        },
+                        { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
+                    ],
+                    dailyStatsCurrentMonth: [
+                        {
+                            $match: {
+                                createdAt: { $gte: startOfCurrentMonth }
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: {
+                                    day: { $dayOfMonth: "$createdAt" },
+                                    month: { $month: "$createdAt" },
+                                    year: { $year: "$createdAt" }
+                                },
+                                count: { $sum: 1 }
+                            }
+                        },
+                        { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
+                    ],
+                    currentMonthStats: [
+                        { $match: { createdAt: { $gte: startOfCurrentMonth } } },
+                        { $count: 'total' }
+                    ],
+                    previousMonthStats: [
+                        { $match: { createdAt: { $gte: startOfPreviousMonth, $lt: startOfCurrentMonth } } },
+                        { $count: 'total' }
+                    ]
+                }
+            }
+        ]);
+
+        const currentMonthCount = result[0].currentMonthStats[0] ? result[0].currentMonthStats[0].total : 0;
+        const previousMonthCount = result[0].previousMonthStats[0] ? result[0].previousMonthStats[0].total : 0;
+        const status = currentMonthCount > previousMonthCount ? 'increase' : 'decrease';
+
+        const response = [
+            {
+                title: 'Total Exchangers',
+                total: result[0].totalExchangers[0] ? result[0].totalExchangers[0].total : 0,
+                stat: {
+                    currentMonth: result[0].dailyStatsCurrentMonth,
+                    previousMonth: result[0].dailyStatsPreviousMonth
+                },
+                status: status
+            },
+            {
+                title: 'Verified',
+                total: result[0].totalVerified[0] ? result[0].totalVerified[0].total : 0,
+                stat: {
+                    currentMonth: result[0].dailyStatsCurrentMonth,
+                    previousMonth: result[0].dailyStatsPreviousMonth
+                },
+                status: status
+            },
+            {
+                title: 'Active now',
+                total: result[0].totalActive[0] ? result[0].totalActive[0].total : 0,
+                stat: {
+                    currentMonth: result[0].dailyStatsCurrentMonth,
+                    previousMonth: result[0].dailyStatsPreviousMonth
+                },
+                status: status
+            }
+        ];
+
+        res.json(response);
     } catch (error) {
-        next({ message: 'Internal server error', error });
+        console.error('API Error:', error);
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -37,7 +137,18 @@ exports.getExchangeStat = async (req, res, next) => {
 
 exports.getExchangers = async (req, res, next) => {
     try {
-        const exchangers = await Exchanger.find().populate('user');
+        const exchangers = await Exchanger.find()
+        .populate({
+            path: 'user',
+            populate: {
+                path: 'referrals',
+                model: 'Referral',
+                populate: {
+                    path: 'referred',
+                    model: 'User'
+                }
+            }
+        });
         res.status(200).json(exchangers);
     } catch (error) {
         next({ message: 'Internal server error' })
@@ -45,17 +156,60 @@ exports.getExchangers = async (req, res, next) => {
 };
 
 
-exports.getExchanger = async (req, res, next) => {
+exports.getUserExchanger = async (req, res, next) => {
     try {
-        const exchanger = await Exchanger.findById(req.params.id).populate('user');
+        console.log(req.params)
+        const user = await User.findOne({userName:req.params.userName})
+        console.log(user)
+        const exchanger = await Exchanger.findOne({user:user._id})
+            .populate({
+                path: 'user',
+                populate: {
+                    path: 'referrals',
+                    model: 'Referral',
+                    populate: {
+                        path: 'referred',
+                        model: 'User'
+                    }
+                }
+            });
+
         if (!exchanger) {
-            next({ message: 'Internal server error' })
+            return next({ message: 'Exchanger not found', statusCode: 404 });
         }
         res.status(200).json(exchanger);
     } catch (error) {
-        next({ message: 'Internal server error' })
+        console.error('Error fetching exchanger:', error);
+        next({ message: 'Internal server error', statusCode: 500 });
     }
 };
+
+
+exports.getExchanger = async (req, res, next) => {
+    try {
+        const exchanger = await Exchanger.findById(req.params.id)
+            .populate({
+                path: 'user',
+                populate: {
+                    path: 'referrals',
+                    model: 'Referral',
+                    populate: {
+                        path: 'referred',
+                        model: 'User'
+                    }
+                }
+            });
+
+        if (!exchanger) {
+            return next({ message: 'Exchanger not found', statusCode: 404 });
+        }
+        res.status(200).json(exchanger);
+    } catch (error) {
+        console.error('Error fetching exchanger:', error);
+        next({ message: 'Internal server error', statusCode: 500 });
+    }
+};
+
 
 
 exports.updateExchanger = async (req, res, next) => {

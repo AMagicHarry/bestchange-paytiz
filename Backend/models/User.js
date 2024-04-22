@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const bcrypt = require('bcrypt');
 
 const UserSchema = new Schema({
     firstName: { 
@@ -11,7 +10,20 @@ const UserSchema = new Schema({
         type: String,
         required: true,
     },
+    userName: {
+        type: String,
+        required: true,
+    },
     avatar: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique:true
+    },
+    password: {
         type: String,
         required: true,
     },
@@ -19,6 +31,11 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         unique: false,
+    },
+    countryCode: { 
+        type: String,
+        required: false,
+        unique: true,
     },
     role: {
         type: String,
@@ -43,7 +60,8 @@ const UserSchema = new Schema({
     referrals: [
          {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
+            ref: 'Referral',
+            required:false,
         }],
 }, {
     timestamps: true,

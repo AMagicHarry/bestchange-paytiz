@@ -1,5 +1,6 @@
 const Blog = require('../models/Blog');
 
+
 exports.addBlog = async (req, res, next) => {
   const { title, user, content } = req.body;
   if (!title || !user || !content) {
@@ -14,14 +15,29 @@ exports.addBlog = async (req, res, next) => {
   }
 };
 
+
 exports.getBlogs = async (req, res, next) => {
   try {
-    const blogs = await Blog.find();
+    const blogs = await Blog.find().populate('user');
     res.status(200).json(blogs);
   } catch (error) {
     next({ message: 'Internal server error' });
   }
 };
+
+exports.getRecentBlogs = async (req, res, next) => {
+  try {
+    const limit = parseInt(req.query.limit) || 3; 
+    const recentBlogs = await Blog.find()
+                                  .sort({ createdAt: -1 })
+                                  .limit(limit).populate('user');   
+
+    res.status(200).json(recentBlogs);
+  } catch (error) {
+    next({ message: 'Internal server error', error });
+  }
+};
+
 
 exports.getBlog = async (req, res, next) => {
   try {

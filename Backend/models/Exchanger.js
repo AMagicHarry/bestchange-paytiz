@@ -8,13 +8,18 @@ const ExchangerSchema = new Schema({
         ref: 'User',
         required: true,
     },
+     currency: { 
+        name: { type: String, required: true },  
+        code: { type: String, required: true }, 
+        symbol: { type: String, required: false}
+    },
     avatar: {
         type: String,
         required: true
     },
     website: {
         type: String,
-        required: false
+        required: true
     },
     name: {
         type: String,
@@ -22,13 +27,9 @@ const ExchangerSchema = new Schema({
     },
     rating: {
         type: Number,
-        required: false,
+        required: true,
         min: 1, 
         max: 5, 
-    },
-    exchangeRate: {
-        type: Number, 
-        required: true
     },
     rateRange: {
         min: { type: Number, required: true },
@@ -37,7 +38,7 @@ const ExchangerSchema = new Schema({
     siteOn: {
         type: Boolean,
         required: true,
-        default: false
+        default: true
     },
     isActive: {
         type: Boolean,
@@ -46,14 +47,20 @@ const ExchangerSchema = new Schema({
     },
     verified: {
         type: Boolean,
-        required: false,
+        required: true,
     },
     legalRegistration: { 
         type: Boolean,
-        required: false
-    }
-}, {
-    timestamps: true,
+        required: true
+    },
+    reviews: [
+        {
+           type: mongoose.Schema.Types.ObjectId,
+           ref: 'Review',
+           required:false,
+       }],
+},{
+    timestamps:true
 });
 
 module.exports = mongoose.model('Exchanger', ExchangerSchema);
