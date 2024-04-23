@@ -1,27 +1,26 @@
 import React from 'react';
 import './imageStack.css';
-import { User } from '../../utils/types';
-import Avatar from '../../assets/user.jpeg'
+import { Referral } from '../../utils/types';
 
 interface Props {
-  users: User[];
+  referrals: Referral[];
 }
 
 
 
-const ImageStack: React.FC<Props> = ({ users }) => {
-  const displayUsers = users.length > 4 ? users.slice(0, 4) : users;
-  const remainingCount = users.length > 4 ? users.length - 4 : 0;
+const ImageStack: React.FC<Props> = ({ referrals }) => {
+  const displayReferrals = referrals?.length > 4 ? referrals?.slice(0, 4) : referrals;
+  const remainingCount = referrals?.length > 4 ? referrals?.length - 4 : 0;
 
   return (
     <div className='image-stack'>
-      {displayUsers.map((user: User, index: number) => (
+      {referrals?.length > 0 && displayReferrals.map((referral: Referral, index: number) => (
         <div
           style={{ marginLeft: index === 0 ? 0 : -5 }}
-          key={user._id}
+          key={referral._id}
           className='image-container'
         >
-          <img  src={Avatar} alt={`User ${index + 1}`} />
+          <img  src={referral.referred.avatar} alt={`User ${index + 1}`} />
         </div>
       ))}
       {remainingCount > 0 && (

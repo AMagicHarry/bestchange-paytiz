@@ -49,19 +49,19 @@ const App = () => {
       <Route path="/" element={<Layout1 />}>
         <Route  element={<AdminDashboard />}>
           <Route index element={<AdminDashboardHome />} />
-          <Route path="details" element={<ExchangerDetails />} />
+          <Route path="/:username/:exchangerId" element={<ExchangerDetails />} />
         </Route>
         <Route path="/referrals" element={<AdminDashboardReferrals />}>
           <Route index element={<AdminDashboardReferralsHome />} />
-          <Route path="details" element={<AdminDashboardReferralsDetails />} />
+          <Route path=":username/:exchangerId" element={<AdminDashboardReferralsDetails />} />
         </Route>
         <Route path="/blog" element={<Blog />} />
       </Route>
 
-      <Route element={<Layout2 />}>
-        <Route path="/user" element={<UserExchangerAdminDashboard />} />
-        <Route path="/user/referrals" element={<UserExchangerAdminReferrals />} />
-        <Route path="/user/reviews" element={<UserExchangerAdminReviews />} />
+      <Route path="/user-admin" element={<Layout2 />}>
+        <Route path=":username" element={<UserExchangerAdminDashboard />} />
+        <Route path=":username/referrals" element={<UserExchangerAdminReferrals />} />
+        <Route path=":username/reviews" element={<UserExchangerAdminReviews />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

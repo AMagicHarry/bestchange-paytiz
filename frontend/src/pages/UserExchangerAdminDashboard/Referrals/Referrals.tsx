@@ -1,117 +1,21 @@
 import Table2 from '../../../components/Table2/Table2';
 import UserCard from '../../../components/UserCard/UserCard';
-import { User } from '../../../utils/types';
 import SwitchButton from '../../../components/switchbutton/SwitchButton';
 import { useState } from 'react';
-
-
-interface headerItem {
-  id: string;
-  title: string;
-  total: string;
-}
-
-// interface UserData {
-//   id: number;
-//   exchanger: any;
-//   rate: string;
-//   rateRange: string;
-//   site: string;
-//   status: string;
-// }
+import { getUserExchangerApi } from '../../../service/api/exchanger';
+import { useParams } from 'react-router-dom';
+import { Exchanger } from '../../../utils/types';
+import useFetch from '../../../components/useFetch/useFetch';
+import { ClipLoader } from 'react-spinners';
 
 const Referrals = () => {
 
+  const { username } = useParams()
 
-  const headerItems: headerItem[] = [
-    {
-      id: "1",
-      title: 'Total referrals',
-      total: "1,420"
-    },
-    {
-      id: "2",
-      title: 'Total Earnings',
-      total: "825"
-    },
-    {
-      id: "3",
-      title: 'Total withdrawal',
-      total: "500"
-    },
-    {
-      id: "4",
-      title: 'Available for withdrawal',
-      total: "325"
-    },
-  ]
+  const { data: exchanger, loading: exchangerLoading } = useFetch<Exchanger>({
+    apiCall: () => getUserExchangerApi({ userName: username ?? "" })
+  });
 
-
-
-
-
-  const users: User[] = [
-    {
-      _id: "1",
-      firstName: "Alice",
-      lastName: "Johnson",
-      avatar: "https://example.com/avatars/1.jpg"
-    },
-    {
-      _id: "2",
-      firstName: "Bob",
-      lastName: "Smith",
-      avatar: "https://example.com/avatars/2.jpg"
-    },
-    {
-      _id: "3",
-      firstName: "Carol",
-      lastName: "Williams",
-      avatar: "https://example.com/avatars/3.jpg"
-    },
-    {
-      _id: "4",
-      firstName: "David",
-      lastName: "Jones",
-      avatar: "https://example.com/avatars/4.jpg"
-    },
-    {
-      _id: "5",
-      firstName: "Eva",
-      lastName: "Brown",
-      avatar: "https://example.com/avatars/5.jpg"
-    },
-    {
-      _id: "6",
-      firstName: "Eva",
-      lastName: "Brown",
-      avatar: "https://example.com/avatars/5.jpg"
-    },
-    {
-      _id: "7",
-      firstName: "Eva",
-      lastName: "Brown",
-      avatar: "https://example.com/avatars/5.jpg"
-    },
-    {
-      _id: "8",
-      firstName: "Eva",
-      lastName: "Brown",
-      avatar: "https://example.com/avatars/5.jpg"
-    },
-    {
-      _id: "9",
-      firstName: "Eva",
-      lastName: "Brown",
-      avatar: "https://example.com/avatars/5.jpg"
-    },
-    {
-      _id: "10",
-      firstName: "Eva",
-      lastName: "Brown",
-      avatar: "https://example.com/avatars/5.jpg"
-    },
-  ];
 
 
   const columns = [
@@ -121,7 +25,7 @@ const Referrals = () => {
   const [isToggled, setIsToggled] = useState(false);
 
   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsToggled(e.target.checked);  
+    setIsToggled(e.target.checked);
   };
 
 
@@ -133,10 +37,10 @@ const Referrals = () => {
         <div className='flex font-[500] text-[12px] items-center gap-[1rem] sm:gap-[3rem]'>
           <span>Turn On/off service</span>
           <SwitchButton
-        name="toggleSwitch"
-        isChecked={isToggled}
-        handleChange={handleToggle}
-      />
+            name="toggleSwitch"
+            isChecked={isToggled}
+            handleChange={handleToggle}
+          />
         </div>
         <div className="flex gap-[1rem] font-[500] text-[12px] sm:gap-[3rem] ">
           <span className="cursor-pointer flex items-center  gap-[.5rem] hover:text-gray-500">
@@ -153,22 +57,54 @@ const Referrals = () => {
       <div className="w-full box-shadow flex flex-col gap-[1rem] justify-between p-[1rem] sm:rounded-lg  bg-white mt-[2rem] min-h-[284px]">
 
         <div className="grid   gap-[1rem] sm:grid-cols-2 md:grid-cols-4 ">
+
           {
-            headerItems.map((header: headerItem) => {
-              return <div key={header.id} className="w-full box-shadow-2  h-[184px] flex flex-col gap-[1rem] items-start justify-center  p-[1rem] rounded-md  border overflow-hidden">
-                <div className="font-[600] text-[#101828]">{header.title}</div>
-                <div className="font-[600] text-[2rem] text-[#101828]">${header.total}</div>
-              </div>
-            })
+            exchanger && !exchangerLoading ?
+              <>
+                <div className="w-full box-shadow-2 overflow-hidden  h-[184px] flex flex-col gap-[1rem] items-start justify-center  p-[1rem] rounded-md  border overflow-hidden">
+                  <div className="font-[600] text-[#101828] ">Total referrals</div>
+                  <div className="font-[600] text-[2rem] text-[#101828]">{exchanger?.user.referrals?.length}</div>
+                </div>
+                <div className="w-full box-shadow-2 overflow-hidden h-[184px] flex flex-col gap-[1rem] items-start justify-center  p-[1rem] rounded-md  border overflow-hidden">
+                  <div className="font-[600] text-[#101828]">Total Earnings</div>
+                  <div className="font-[600] text-[2rem] text-[#101828]">${exchanger?.user.totalEarnings}</div>
+                </div>
+                <div className="w-full box-shadow-2 overflow-hidden  h-[184px] flex flex-col gap-[1rem] items-start justify-center  p-[1rem] rounded-md  border overflow-hidden">
+                  <div className="font-[600] text-[#101828]">Total withdrawal</div>
+                  <div className="font-[600] text-[2rem] text-[#101828]">${exchanger?.user.totalWithdrawal}</div>
+                </div>
+                <div className="w-full box-shadow-2 overflow-hidden  h-[184px] flex flex-col gap-[1rem] items-start justify-center  p-[1rem] rounded-md  border overflow-hidden">
+                  <div className="font-[600] text-[#101828]">Available for withdrawal</div>
+                  <div className="font-[600] text-[2rem] text-[#101828] truncate">${exchanger?.user.availableForWithdrawal}</div>
+                </div>
+              </>
+              : Array.from({ length: 4 }, (_, index) => (
+                <div key={index} className="w-full h-[184px] flex flex-col items-start justify-center p-4 rounded-md border overflow-hidden">
+                  <div className="h-full w-full">
+                    <div className="h-full w-full bg-gray-200 rounded-md animate-pulse">
+                    </div>
+                  </div>
+                </div>
+
+              ))
           }
+
+
+
+
         </div>
 
-      </div>
 
+      </div>
 
       <div className="mt-[2rem]">
-        <Table2 Component={UserCard} data={users} columns={columns} />
+        {
+          !exchangerLoading ?  <Table2 Component={UserCard} data={exchanger?.user?.referrals || []} columns={columns} /> : <div className='w-full flex items-center justify-center'>
+            <ClipLoader size={14} color='black' />
+          </div>
+        }
       </div>
+
     </div>
   )
 }

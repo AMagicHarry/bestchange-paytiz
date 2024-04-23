@@ -2,16 +2,9 @@ import React from 'react'
 import { FaStar } from 'react-icons/fa';
 import CommentIcon from '../../assets/comment.svg'
 import PenIcon from '../../assets/pen.svg'
-
-
-export interface Review {
-    id: string,
-    name: string;
-    date: string;
-    content: string;
-    rating: string;
-    countryIcon: string;
-}
+import { Review } from '../../utils/types';
+import { CountryAvatar } from '../CountryFlag/CountryFlage';
+import { formatDate } from '../../utils/functions';
 
 
 export interface ReviewersCardProps {
@@ -25,10 +18,14 @@ const ReviewersCard: React.FC<ReviewersCardProps> = ({ review, isEditable }) => 
         <div className='flex py-[1rem] border-b w-full flex-col gap-[2rem]'>
             <div className='flex items-center   justify-between'>
                 <div className='flex flex-col'>
-                    <span className='font-[600] text-base'>{review.name}</span>
-                    <div className='flex item-center gap-[1rem]'>
-                        <span className='text-[12px] font-[500]'>{review.date}</span>
-                        <img className='w-[24px] h-[24px]' src={review.countryIcon} alt="Icon" />
+
+                    <span className='font-[600] text-base'>{review.user.firstName}  {review.user.lastName}</span>
+
+                    <div className='flex items-center gap-[1rem]'>
+                        <span className='text-[12px] font-[500]'>{formatDate(review?.createdAt??"")}</span>
+                        <div className='w-[40px] h-[40px] rounded-full overflow-hidden'>
+                            <CountryAvatar code={review.user.countryCode??""}/>
+                        </div>
                     </div>
                 </div>
                 {
@@ -49,13 +46,10 @@ const ReviewersCard: React.FC<ReviewersCardProps> = ({ review, isEditable }) => 
                 }
             </div>
             <div className='flex items-center gap-[.5rem]'>
-                <FaStar className='text-[#FDB022]' />
-                <FaStar className='text-[#FDB022]' />
-                <FaStar className='text-[#FDB022]' />
-                <FaStar className='text-[#FDB022]' />
-                <FaStar className='text-[#FDB022]' />
-                <FaStar className='text-[#FDB022]' />
-            </div>
+                                {Array.from({ length: review.rating??0 }, (_, index) => (
+                                    <FaStar key={index} className='text-[#FDB022] text-[14px]' />
+                                ))}
+                            </div>
 
         </div>
     )

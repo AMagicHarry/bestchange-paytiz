@@ -1,63 +1,42 @@
 import { FaAward } from "react-icons/fa";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
-import Avatar from '../../../../assets/exchangerAvatar.svg'
-import Image from '../../../../assets/exchangerImage.svg'
 import { FaStar } from "react-icons/fa";
-import Country from '../../../../assets/country.svg'
 import ReviewersCard from "../../../../components/ReviewersCard/ReviewersCard";
 import SwitchButton from "../../../../components/switchbutton/SwitchButton";
 import { useState } from "react";
-
+import { getExchangerApi } from "../../../../service/api/exchanger";
+import useFetch from "../../../../components/useFetch/useFetch";
+import { Exchanger } from "../../../../utils/types";
+import { useParams } from "react-router-dom";
+import { getReviewsApi } from "../../../../service/api/review";
+import { Review } from "../../../../utils/types";
+import { useEffect } from "react";
+import { CountryAvatar } from "../../../../components/CountryFlag/CountryFlage";
 
 const ExchangerDetails = () => {
-   const reviewers = [
-    {
-      id:"1",
-      name:"Caitylin King",
-      content:" Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date:"Jan 11,2023 at 01:49pm",
-      rating:'5',
-      countryIcon:Country
-    },
-    {
-      id:"2",
-      name:"Caitylin King",
-      content:" Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date:"Jan 11,2023 at 01:49pm",
-      rating:'5',
-      countryIcon:Country
-    },
-    {
-      id:"3",
-      name:"Caitylin King",
-      content:" Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date:"Jan 11,2023 at 01:49pm",
-      rating:'5',
-      countryIcon:Country
-    },
-    {
-      id:"4",
-      name:"Caitylin King",
-      content:" Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date:"Jan 11,2023 at 01:49pm",
-      rating:'5',
-      countryIcon:Country
-    },
-    {
-      id:"5",
-      name:"Caitylin King",
-      content:" Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore, natus quasi consequuntur, necessitatibus quis ratione iste odio aliquam labore numquam excepturi veritatis placeat quo consectetur ad suscipit dicta sunt saepe.",
-      date:"Jan 11,2023 at 01:49pm",
-      rating:'5',
-      countryIcon:Country
-    },
-   ]
 
+  const {exchangerId} = useParams()
+
+    const { data:exchanger} = useFetch<Exchanger>({
+      apiCall: ()=>getExchangerApi({exchangerId:exchangerId??""}),
+      dependencies:[exchangerId]
+    });
+
+    const { data:reviews } = useFetch<Review[]>({
+      apiCall: ()=>getReviewsApi(exchangerId??""),
+      dependencies:[exchangerId]
+    });
 
    const [isToggled, setIsToggled] = useState(false);
    const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-     setIsToggled(e.target.checked);  // Update state based on checkbox's checked status
+     setIsToggled(e.target.checked); 
    };
+
+   useEffect(() => {
+    if (exchanger) {
+      setIsToggled(exchanger.siteOn);
+    }
+  }, [exchanger]);
 
 
   return (
@@ -82,32 +61,34 @@ const ExchangerDetails = () => {
 
         <div className="flex flex-wrap justify-start sm:justify-start items-center gap-[3rem]">
           <div className='w-[256px] h-[256px]'>
-            <img src={Image} className='w-full h-full' alt="Image" />
+            <img src={exchanger?.avatar} className='w-full h-full' alt="Image" />
           </div>
 
           <div className='flex flex-col justify-start gap-[2rem]'>
 
             <span>
               <div className='w-[60px] h-[60px] rounded-full overflow-hidden'>
-                <img src={Avatar} alt="" />
+                <img src={exchanger?.avatar} alt="" />
               </div>
               <div className='font-[600]'>
-                Catalog
+                {exchanger?.name}
               </div>
-              <p>Catalogapp.io</p>
+              <p>{exchanger?.website}</p>
             </span>
 
-            <div className='flex items-center gap-[1rem]'>
-              <FaStar className='text-[#FDB022] text-[35px]' />
-              <FaStar className='text-[#FDB022] text-[35px]' />
-              <FaStar className='text-[#FDB022] text-[35px]' />
-              <FaStar className='text-[#FDB022] text-[35px]' />
-              <FaStar className='text-[#FDB022] text-[35px]' />
-            </div>
+            <div className='flex items-center gap-[.5rem]'>
+                                {Array.from({ length: exchanger?.rating??0 }, (_, index) => (
+                                    <FaStar key={index} className='text-[#FDB022] text-[14px]' />
+                                ))}
+              </div>
 
             <div className='flex items-center gap-[1rem]'>
-              <FaAward className='text-[#17B26A] text-[35px]' />
-              <RiVerifiedBadgeFill className='text-[#17B26A] text-[35px]' />
+              {
+                exchanger?.verified && <FaAward className='text-[#17B26A] text-[35px]' />
+              }
+             {
+              exchanger?.legalRegistration &&  <RiVerifiedBadgeFill className='text-[#17B26A] text-[35px]' />
+             }
             </div>
 
           </div>
@@ -115,21 +96,21 @@ const ExchangerDetails = () => {
           <div className='flex flex-col gap-[1rem]'>
             <div className='flex items-center gap-[1rem]'>
               <span className='w-[5rem] font-[400]'>Status:   </span>
-              <div className='rounded-full border w-[81px] flex items-center justify-center h-[22px]  bg-[#ABEFC6]'>Active</div>
+              <div className='rounded-full border  flex items-center px-[1rem] justify-center h-[33px]  bg-[#ABEFC6]'>{exchanger?.isActive?"Active":"Suspended"}</div>
             </div>
             <div className='flex items-center gap-[1rem]'>
               <span className='w-[5rem] font-[400]'>Owner:   </span>
-              <div >Henry VII</div>
+              <div >{exchanger?.user?.firstName}  {exchanger?.user?.lastName}</div>
             </div>
             <div className='flex items-center gap-[1rem]'>
               <span className='w-[5rem] font-[400]'>Country:   </span>
-              <div className="w-[40px] h-[40px] rounded-full overflow-hidden">
-                <img className="w-ful h-full " src={Country} alt="" />
-              </div>
+              <div className='w-[40px] h-[40px] rounded-full overflow-hidden'>
+                            <CountryAvatar code={exchanger?.user.countryCode??""}/>
+                        </div>
             </div>
             <div className='flex items-center gap-[1rem]'>
               <span className='w-[5rem] font-[400]'>Established:   </span>
-              <div>2017</div>
+              <div>{exchanger?.createdAt}</div>
             </div>
           </div>
 
@@ -142,8 +123,8 @@ const ExchangerDetails = () => {
           Reviews
         </div>
          {
-          reviewers.map(review=>{
-            return <ReviewersCard key={review.id} isEditable={false} review={review}/>
+          reviews?.map(review=>{
+            return <ReviewersCard key={review._id} isEditable={false} review={review}/>
           })
          }
       </div>

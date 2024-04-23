@@ -1,15 +1,16 @@
 const router = require('express').Router();
-const {getUsers,deleteUser,updateUser} = require('../controllers/user.js');
-const { protect } = require('../middleware/protect.js');
+const { getUsers, getUser, deleteUser, updateUser, addUser } = require('../controllers/user.js');
+// const { protect } = require('../middleware/protect.js');
 
-router.use(protect);
+// router.use(protect);
 
 router.route('/')
-.get(getUsers) 
+    .get(getUsers) 
+    .post(addUser); 
 
 router.route('/:id')
-.delete(deleteUser) 
-.put(updateUser);
-
+    .get(getUser)   
+    .delete(deleteUser)  
+    .put(updateUser);  
 
 module.exports = router;

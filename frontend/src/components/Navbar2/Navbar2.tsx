@@ -4,9 +4,11 @@ import { LanguageDropdown } from '../LanguageDropDown/LanguageDropDown';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaBars } from 'react-icons/fa';
 import { useState } from 'react';
+import { useAuthContext } from '../../hooks/useAuthContext';
 
 const Navbar2 = () => {
     const [active, setActive] = useState(false);
+    const {user} = useAuthContext()
 
     return (
         <div className='bg-white border-b'>
@@ -14,11 +16,11 @@ const Navbar2 = () => {
                 <div className='flex items-center gap-4'>
                     <NavLink to='/' className='flex items-center gap-4' >
                         <img src={Logo} alt="logo" className='h-8 w-8' />
-                        <span className='hidden font-[600] text-[16px] sm:flex'>Company name</span>
+                        <span className='hidden font-[600] text-[16px] sm:flex'>Paytiz</span>
                     </NavLink>
                     <div className={`hidden md:flex items-center gap-4 ${active ? 'flex' : 'hidden'}`}>
                         <NavLink
-                            to='/user'
+                            to={`/user-admin/${user?.userName}`}
                             className={({ isActive }) =>
                                 `flex flex-col  items-center font-[600] text-[16px]  justify-center    ${isActive ? 'text-black' : 'text-gray-600'}  h-full duration-300  font-500 duration-300 cursor-pointer`
                             }>
@@ -26,7 +28,7 @@ const Navbar2 = () => {
 
                         </NavLink>
                         <NavLink
-                            to='/user/referrals'
+                            to={`/user-admin/${user?.userName}/referrals`}
                             className={({ isActive }) =>
                                 `flex flex-col  items-center font-[600] text-[16px]  justify-center    ${isActive ? 'text-black' : 'text-gray-600'}  h-full duration-300  font-500 duration-300 cursor-pointer`
                             }>
@@ -34,7 +36,7 @@ const Navbar2 = () => {
 
                         </NavLink>
                         <NavLink
-                            to='/user/reviews'
+                             to={`/user-admin/${user?.userName}/reviews`}
                             className={({ isActive }) =>
                                 `flex flex-col  items-center font-[600] text-[16px]  justify-center    ${isActive ? 'text-black' : 'text-gray-600'}  h-full duration-300  font-500 duration-300 cursor-pointer`
                             }>
