@@ -3,7 +3,7 @@ import './imageStack.css';
 import { Referral } from '../../utils/types';
 
 interface Props {
-  refe: Referral[];
+  referrals: Referral[];
 }
 
 

@@ -12,7 +12,7 @@ const Referrals = () => {
 
   const { username } = useParams()
 
-  const { data: exchanger, loading: exchangerLoading, error: exchangerError } = useFetch<Exchanger>({
+  const { data: exchanger, loading: exchangerLoading } = useFetch<Exchanger>({
     apiCall: () => getUserExchangerApi({ userName: username ?? "" })
   });
 

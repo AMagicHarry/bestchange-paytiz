@@ -11,7 +11,7 @@ const Details = () => {
 
   const {exchangerId} = useParams()
 
-  const { data:exchanger, loading:exchangerLoading, error:exchangerError } = useFetch<Exchanger>({
+  const { data:exchanger, loading:exchangerLoading} = useFetch<Exchanger>({
     apiCall: ()=>getExchangerApi({exchangerId:exchangerId??""})
   });
 

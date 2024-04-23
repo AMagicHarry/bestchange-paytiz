@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaStar, FaAward } from 'react-icons/fa';
 import { RiVerifiedBadgeFill } from 'react-icons/ri';
 import SwitchButton from '../switchbutton/SwitchButton';

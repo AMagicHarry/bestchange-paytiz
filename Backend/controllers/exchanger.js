@@ -158,9 +158,10 @@ exports.getExchangers = async (req, res, next) => {
 
 exports.getUserExchanger = async (req, res, next) => {
     try {
-        console.log(req.params)
         const user = await User.findOne({userName:req.params.userName})
-        console.log(user)
+        if(!user){
+            return next({ message: 'User does not exist'});
+        }
         const exchanger = await Exchanger.findOne({user:user._id})
             .populate({
                 path: 'user',

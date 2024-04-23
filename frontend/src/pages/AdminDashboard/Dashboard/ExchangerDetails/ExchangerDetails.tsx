@@ -17,15 +17,15 @@ const ExchangerDetails = () => {
 
   const {exchangerId} = useParams()
 
-    const { data:exchanger, loading:exchangerLoding, error:exchangerError } = useFetch<Exchanger>({
+    const { data:exchanger} = useFetch<Exchanger>({
       apiCall: ()=>getExchangerApi({exchangerId:exchangerId??""}),
       dependencies:[exchangerId]
     });
 
-    // const { data:reviews, loading:reviewsLoding, error:reviewsError } = useFetch<Review[]>({
-    //   apiCall: ()=>getReviewsApi(exchangerId??""),
-    //   dependencies:[exchangerId]
-    // });
+    const { data:reviews } = useFetch<Review[]>({
+      apiCall: ()=>getReviewsApi(exchangerId??""),
+      dependencies:[exchangerId]
+    });
 
    const [isToggled, setIsToggled] = useState(false);
    const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +118,7 @@ const ExchangerDetails = () => {
 
       </div>
 
-      {/* <div className="box-shadow mt-[3rem] py-[1rem]  px-[1rem] rounded-lg w-full bg-white h-[max-content]">
+      <div className="box-shadow mt-[3rem] py-[1rem]  px-[1rem] rounded-lg w-full bg-white h-[max-content]">
         <div className="font-[500]">
           Reviews
         </div>
@@ -127,7 +127,7 @@ const ExchangerDetails = () => {
             return <ReviewersCard key={review._id} isEditable={false} review={review}/>
           })
          }
-      </div> */}
+      </div>
 
     </div>
   )

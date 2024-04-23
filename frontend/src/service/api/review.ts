@@ -1,4 +1,4 @@
-import { Review } from "../../components/ReviewersCard/ReviewersCard";
+import { Review } from "../../utils/types";
 import axios from "axios";
 
 const baseUrl: string = import.meta.env.VITE_BACKEND_ENDPOINT

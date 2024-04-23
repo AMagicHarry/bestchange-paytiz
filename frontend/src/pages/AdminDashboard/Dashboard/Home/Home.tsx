@@ -20,10 +20,10 @@ import { ClipLoader } from 'react-spinners'
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: exchangersStat, loading: exchangersStatLoading, error: exchangersStatError } = useFetch<ExchangerSummary[]>({
+  const { data: exchangersStat } = useFetch<ExchangerSummary[]>({
     apiCall: () => getExchangeStatApi()
   });
-  const { data: exchangers, loading: exchangersLoading, error: exchangersError } = useFetch<Exchanger[]>({
+  const { data: exchangers, loading: exchangersLoading } = useFetch<Exchanger[]>({
     apiCall: () => getExchangersApi()
   });
 
